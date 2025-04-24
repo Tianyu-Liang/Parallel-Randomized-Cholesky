@@ -1,0 +1,13 @@
+include("write_graph.jl")
+include("lap_grid.jl")
+
+graph_produce("../data/fe_sphere/fe_sphere", "random")
+graph_produce("../data/GAP-road/GAP-road", "random")
+graph_produce("../data/com-Orkut/com-Orkut", "random")
+graph_produce("../data/com-LiveJournal/com-LiveJournal", "random")
+graph_produce("../data/hollywood-2009/hollywood-2009", "random")
+graph_produce("../data/kmer_A2a/kmer_A2a", "random")
+graph_produce("../data/kron_g500-logn20/kron_g500-logn20", "random")
+graph_produce("../data/venturiLevel3/venturiLevel3", "random")
+graph_produce("../data/roadNet-TX/roadNet-TX", "random")
+graph_produce("../data/belgium_osm/belgium_osm", "random")

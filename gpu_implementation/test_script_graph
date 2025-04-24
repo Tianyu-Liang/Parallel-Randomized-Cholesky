@@ -1,0 +1,10 @@
+
+
+list1=("../physics/ecology1/ecology1-nnz-sorted.mtx" "../data/GAP-road/GAP-road-nnz-sorted.mtx" "../data/com-LiveJournal/com-LiveJournal-nnz-sorted.mtx" 
+    "../data/europe_osm/europe_osm-nnz-sorted.mtx" "../data/delaunay_n24/delaunay_n24-nnz-sorted.mtx" "../data/venturiLevel3/venturiLevel3-nnz-sorted.mtx" 
+    "../data/belgium_osm/belgium_osm-nnz-sorted.mtx")
+
+for (( i=0; i<${#list1[@]}; i++ )); do
+ 
+  ./driver ${list1[i]} 512 1 1e-7
+done

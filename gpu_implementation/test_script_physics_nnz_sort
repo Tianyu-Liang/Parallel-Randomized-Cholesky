@@ -1,0 +1,8 @@
+list1=("../physics/parabolic_fem/parabolic_fem-nnz-sorted.mtx" "../physics/ecology2/ecology2-nnz-sorted.mtx" "../physics/apache2/apache2-nnz-sorted.mtx" "../physics/G3_circuit/G3_circuit-nnz-sorted.mtx" 
+"../physics/uniform_3D/uniform_3D-nnz-sorted.mtx" "../physics/aniso_contrast_3D/aniso_contrast_3D-nnz-sorted.mtx" 
+"../physics/poisson_contrast_3D/poisson_contrast_3D-nnz-sorted.mtx" "../physics/spe16m/spe16m-nnz-sorted.mtx")
+
+for (( i=0; i<${#list1[@]}; i++ )); do
+ 
+  ./driver ${list1[i]} 512 1 7e-7
+done

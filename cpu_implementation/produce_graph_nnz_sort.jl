@@ -1,0 +1,13 @@
+include("write_graph.jl")
+include("lap_grid.jl")
+
+graph_produce("../data/fe_sphere/fe_sphere", "nnz-sort")
+graph_produce("../data/GAP-road/GAP-road", "nnz-sort")
+graph_produce("../data/com-Orkut/com-Orkut", "nnz-sort")
+graph_produce("../data/com-LiveJournal/com-LiveJournal", "nnz-sort")
+graph_produce("../data/hollywood-2009/hollywood-2009", "nnz-sort")
+graph_produce("../data/kmer_A2a/kmer_A2a", "nnz-sort")
+graph_produce("../data/kron_g500-logn20/kron_g500-logn20", "nnz-sort")
+graph_produce("../data/venturiLevel3/venturiLevel3", "nnz-sort")
+graph_produce("../data/roadNet-TX/roadNet-TX", "nnz-sort")
+graph_produce("../data/belgium_osm/belgium_osm", "nnz-sort")

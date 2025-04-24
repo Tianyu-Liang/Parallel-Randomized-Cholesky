@@ -1,0 +1,16 @@
+./a.out ../physics/parabolic_fem/parabolic_fem-nnz-sorted.mtx 1
+./a.out ../physics/ecology2/ecology2-nnz-sorted.mtx 1
+./a.out ../physics/apache2/apache2-nnz-sorted.mtx 1
+./a.out ../physics/G3_circuit/G3_circuit-nnz-sorted.mtx 1
+./a.out ../physics/uniform_3D/uniform_3D-nnz-sorted.mtx 1
+./a.out ../physics/aniso_contrast_3D/aniso_contrast_3D-nnz-sorted.mtx 1
+./a.out ../physics/poisson_contrast_3D/poisson_contrast_3D-nnz-sorted.mtx 1
+./a.out ../physics/spe16m/spe16m-nnz-sorted.mtx 1
+
+./a.out ../physics/ecology1/ecology1-nnz-sorted.mtx 0
+./a.out ../data/GAP-road/GAP-road-nnz-sorted.mtx 0
+./a.out ../data/com-LiveJournal/com-LiveJournal-nnz-sorted.mtx 0
+./a.out ../data/europe_osm/europe_osm-nnz-sorted.mtx 0
+./a.out ../data/delaunay_n24/delaunay_n24-nnz-sorted.mtx 0 
+./a.out ../data/venturiLevel3/venturiLevel3-nnz-sorted.mtx 0
+./a.out ../data/belgium_osm/belgium_osm-nnz-sorted.mtx 0
