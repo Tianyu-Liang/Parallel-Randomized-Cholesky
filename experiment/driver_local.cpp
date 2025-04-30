@@ -933,7 +933,7 @@ void factorization_driver(sparse_matrix_processor<type_int, type_data> &processo
         // }
     }
     
-    printf("nnz ratio: %f, factor nnz: %d, original nnz: %d\n", double(total_needed_size) / double(spmat.nonZeros()), total_needed_size, spmat.nonZeros());
+    printf("nnz ratio: %f, factor nnz: %d, original lower triangular nnz (exclude diagonal): %d\n", double(total_needed_size) / double(spmat.nonZeros()), total_needed_size, spmat.nonZeros());
     std::vector<type_data> csr_val_host(total_needed_size);
     std::vector<type_int> csr_col_ind_host(total_needed_size);
 

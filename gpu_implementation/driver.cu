@@ -1287,10 +1287,7 @@ __global__ void perform_factorization_device(const sparse_matrix_device<type_int
     {
         //printf("run count: %d\n", run_count);
     }
-    if(lane_id == 0 && blockIdx.x == 0)
-    {
-        printf("count num: %d\n", device_node_list[0].count);
-    }
+
     
     // if(threadIdx.x == 0 && blockIdx.x == 1)
     // {
@@ -1661,9 +1658,9 @@ void factorization_driver(sparse_matrix_processor<type_int, type_data> &processo
     for (type_int i = 0; i < rand_vec_size; i++) {
        rand_vec[i] = i;
     }
-    std::random_device rd;
-    std::mt19937 g(rd());
-    std::shuffle(rand_vec.data(), rand_vec.data() + rand_vec_size, g);
+    // std::random_device rd;
+    // std::mt19937 g(rd());
+    // std::shuffle(rand_vec.data(), rand_vec.data() + rand_vec_size, g);
 
     // Allocate raw device memory.
     type_int* rand_vec_device = nullptr;
@@ -1679,7 +1676,8 @@ void factorization_driver(sparse_matrix_processor<type_int, type_data> &processo
         std::cerr << "cudaMemcpy failed: " << cudaGetErrorString(err) << "\n";
         exit(0);
     }
-
+    thrust::default_random_engine shuffle_rand;
+    thrust::shuffle(thrust::device, rand_vec_device, rand_vec_device + rand_vec_size, shuffle_rand);
 
     
     printf("CURRENTLY, MULTIPLICITY STORAGE USES INT32, DON'T NEED 64 BIT UNLESS IN EXTREME CIRCUMSTANCES \n");
