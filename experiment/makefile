@@ -5,7 +5,7 @@ NVCC = /usr/bin/g++
 #CUDAPATH = /opt/nvidia/hpc_sdk/Linux_x86_64/23.9/cuda/12.2/lib64
 
 
-METIS_PATH = /pscratch/sd/t/tianyul/parmetis/local
+
 
 CXXFLAGS =  -std=c++20 -O3 \
 		   -I/pscratch/sd/t/tianyul/fast_matrix_market/include/
