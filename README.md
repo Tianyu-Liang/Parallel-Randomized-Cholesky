@@ -20,6 +20,8 @@ $ ./driver path/to/parabolic_fem-nnz-sorted.mtx 32 ""
 ```
 Also see physics_test_nnz_sort.sh and similar files for examples.
 
+**The code in experiment folder requires MKL. On Perlmutter, the code can be compiled by using "module load intel" to load the intel paths.**
+
 **GPU**
 The there are two relevant files in gpu_implementation that handles both the natural Laplacian (driver.cu) and converted SDDM to Laplacians (driver_physics.cu) respectively. One can change which file to compile in the makefile. An example run is the follow:
 ```console
