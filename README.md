@@ -1,7 +1,7 @@
 # Software Needed
 1. Linux OS (maybe MacOS, not tested yet).
 2. Julia programming language is required to run some matrix preprocessing step. The instructions for download can be found on: [Julia Programming Language](https://github.com/JuliaLang/julia).
-3. [Fast matrix market](https://github.com/alugowski/fast_matrix_market) is required for reading in matrix market files. This package can be used as a template based library, which means no compilation is needed. The files can be directly included and used. Later on, user will have to specify the path to the include folder of fast matrix market in makefile.
+3. [Fast matrix market](https://github.com/alugowski/fast_matrix_market) is required for reading in matrix market files. This package can be used as a template based library, which means no compilation is needed. The user can simply clone the repo. Later on, user will have to specify the path to the include folder of fast matrix market in makefile.
 4. Matlab (optional, used for comparison benchmarks)
 5. g++ (version 12 or 13)
 6. Intel c++ compiler (icpx or similar, 2024 version) for compiling intel MKL code, which is used by the solver. This is optional and only required if you want to run the complete factorize + solve pipeline in the experiment folder (CPU).
@@ -11,7 +11,10 @@
 
 
 # Instructions
-We provide a series of instructions for running our implementation for a subset of the experiments found in [the paper](https://arxiv.org/abs/2505.02977).
+We provide a series of instructions for running our implementation for a subset of the experiments found in [the paper](https://arxiv.org/abs/2505.02977). These instructions will show you how to download some of the datasets, preprocess them, and run example versions of our experiments.
+
+## Downloading datasets
+TODO
 
 "cpu_implementation" contains the cpu version of our code, and it contains only the factorization part. "experiment" folder contains the complete pipeline (factorization and solve on cpu). "gpu_implementation" contains the gpu code.
 
