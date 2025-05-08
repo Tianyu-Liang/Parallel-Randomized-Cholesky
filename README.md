@@ -13,8 +13,49 @@
 # Instructions
 We provide a series of instructions for running our implementation for a subset of the experiments found in [the paper](https://arxiv.org/abs/2505.02977). These instructions will show you how to download some of the datasets, preprocess them, and run example versions of our experiments.
 
+## Downloading and including fast matrix market
+In the top repo directory, run
+```git clone https://github.com/alugowski/fast_matrix_market.git```
+
 ## Downloading datasets
-TODO
+Run our demo setup script to download some physics datasets, and generate some others:
+
+```sh demo_setup.sh```
+
+After this is done, you will have a physics/ subdirectory containing the preprocessed physics datasets.
+
+## Running CPU factorization experiment
+
+```cd cpu_implementation```
+
+Open the makefile for editing:
+
+`nano makefile`
+
+and edit the following line:
+
+`CXXFLAGS =  -std=c++20 -O3 \
+		   -I/pscratch/sd/t/tianyul/fast_matrix_market/include/`
+     
+to 
+
+`CXXFLAGS =  -std=c++20 -O3 \
+		   -I[global path to top repo directory]/Parallel-Randomized-Cholesky/fast_matrix_market/include`
+
+Save the makefile and exit nano. Then compile:
+
+```make```
+
+Now you are ready to run the experiment:
+
+```./driver ../physics/parabolic_fem/parabolic_fem-nnz-sorted.mtx 32 "" 1```
+
+The above command factorizes the parabolic_fem-nnz-sorted matrix.
+
+You can repeat this experiment on other datasets with the suffix `-nnz-sorted.mtx` in the physics/ subdirectory. The arguments to the driver function are as follows:
+The first argument (`../physics/parabolic_fem/parabolic_fem-nnz-sorted.mtx` in the above example) is the matrix path. The second argument (`32` in above example) indicates the number of threads to use. The third argument indicates the location to write the computed factorization to. An empty string for the third argument tells the program to not write anything. The last flag `1` simply indicates that this matrix is not originally a Laplacian, and the true solution will need to be trimmed and converted. All input matrices in physics/ should be run with this flag set to 1.
+
+## Older readme stuff
 
 "cpu_implementation" contains the cpu version of our code, and it contains only the factorization part. "experiment" folder contains the complete pipeline (factorization and solve on cpu). "gpu_implementation" contains the gpu code.
 
