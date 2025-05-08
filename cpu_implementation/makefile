@@ -22,7 +22,7 @@ LDFLAGS = -fopenmp \
 
 TARGET = driver
 SRC = driver_local.cpp
-HEADERS = pre_process.hpp auxilliary.hpp custom_cg.hpp
+HEADERS = pre_process.hpp auxilliary.hpp
 
 all: $(TARGET)
 
