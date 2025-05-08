@@ -1,7 +1,16 @@
+# Software Needed
+1. Julia programming language is required to run some matrix preprocessing step. The instructions for download can be found on: [Julia Programming Language](https://github.com/JuliaLang/julia).
+2. [Fast matrix market](https://github.com/alugowski/fast_matrix_market) is required for reading in matrix market files. This package can be used as a template based library, which means no compilation is needed. The files can be directly included and used.
+3. Matlab (optional, used for comparison benchmarks)
+4. g++ (version 12 or 13), icpx or similar for compiling intel MKL code, which is used by the solver.
+
+
+
+
 # Instructions
 "cpu_implementation" contains the cpu version of our code, and it contains only the factorization part. "experiment" folder contains the complete pipeline (factorization and solve on cpu). "gpu_implementation" contains the gpu code.
 
-The user needs to first download fast matrix market from "https://github.com/alugowski/fast_matrix_market"
+
 To run the code, we would first need to download the relevant matrices from suitesparse and put them into a folder (e.g. data, physics). For instance, the location of "parabolic_fem" should be "data/parabolic_fem/parabolic_fem.mtx".
 Then one should use write_graph.jl from "cpu_implementation" to write down the reordered matrices. See the jl files starting with the prefix "produce" for examples on how to create those matrices.
 **Make sure to create a folder for each matrix (i.e. parabolic_fem folder would contain all variations of the parabolic_fem matrices). Folders must be manually created for matrices that are not from SuiteSparse (i.e. 3D uniform poisson, etc.). The folder must exist before running the julia script, otherwise the run might fail.**
