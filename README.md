@@ -5,7 +5,7 @@
 4. Matlab (optional, used for comparison benchmarks)
 5. g++ (version 12 or 13)
 6. Intel c++ compiler (icpx or similar, 2024 version) for compiling intel MKL code, which is used by the solver. This is optional and only required if you want to run the complete factorize + solve pipeline in the experiment folder (CPU).
-7. CUDA (12.4) for running GPU experiments.
+7. CUDA (12.4) for running GPU experiments. An example download instruction for version 12.4 can be found here: [cuda toolkit](https://developer.nvidia.com/cuda-12-4-0-download-archive). Other versions starting with 12 may also work.
 
 
 
