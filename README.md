@@ -11,6 +11,8 @@
 
 
 # Instructions
+We provide a series of instructions for running our implementation for a subset of the experiments found in [the paper](https://arxiv.org/abs/2505.02977).
+
 "cpu_implementation" contains the cpu version of our code, and it contains only the factorization part. "experiment" folder contains the complete pipeline (factorization and solve on cpu). "gpu_implementation" contains the gpu code.
 
 
