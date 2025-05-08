@@ -4,6 +4,7 @@
 The user needs to first download fast matrix market from "https://github.com/alugowski/fast_matrix_market"
 To run the code, we would first need to download the relevant matrices from suitesparse and put them into a folder (e.g. data, physics). For instance, the location of "parabolic_fem" should be "data/parabolic_fem/parabolic_fem.mtx".
 Then one should use write_graph.jl from "cpu_implementation" to write down the reordered matrices. See the jl files starting with the prefix "produce" for examples on how to create those matrices.
+**Make sure to create a folder for each matrix (i.e. parabolic_fem folder would contain all variations of the parabolic_fem matrices). Folders must be manually created for matrices that are not from SuiteSparse (i.e. 3D uniform poisson, etc.)**
 
 Lastly, fill out the correct paths in the makefile and compile the code. 
 
