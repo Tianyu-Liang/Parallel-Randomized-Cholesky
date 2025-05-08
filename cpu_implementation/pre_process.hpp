@@ -337,7 +337,7 @@ class sparse_matrix_processor {
             
 
             // Load the matrix from file
-            std::string path = "../data/";
+            std::string path = "";
             std::ifstream input_stream(path + name);
             triplet_matrix<type_int, type_data> input_triplet;
             input_triplet.nrows = 28924;
