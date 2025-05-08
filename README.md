@@ -1,6 +1,6 @@
 # Software Needed
 1. Julia programming language is required to run some matrix preprocessing step. The instructions for download can be found on: [Julia Programming Language](https://github.com/JuliaLang/julia).
-2. [Fast matrix market](https://github.com/alugowski/fast_matrix_market) is required for reading in matrix market files. This package can be used as a template based library, which means no compilation is needed. The files can be directly included and used.
+2. [Fast matrix market](https://github.com/alugowski/fast_matrix_market) is required for reading in matrix market files. This package can be used as a template based library, which means no compilation is needed. The files can be directly included and used. Later on, user will have to specify the path to the include folder of fast matrix market in makefile.
 3. Matlab (optional, used for comparison benchmarks)
 4. g++ (version 12 or 13), icpx or similar for compiling intel MKL code, which is used by the solver.
 5. CUDA (12.4) for running GPU experiments.
