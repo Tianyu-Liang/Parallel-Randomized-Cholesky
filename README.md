@@ -1,10 +1,11 @@
 # Software Needed
-1. Julia programming language is required to run some matrix preprocessing step. The instructions for download can be found on: [Julia Programming Language](https://github.com/JuliaLang/julia).
-2. [Fast matrix market](https://github.com/alugowski/fast_matrix_market) is required for reading in matrix market files. This package can be used as a template based library, which means no compilation is needed. The files can be directly included and used. Later on, user will have to specify the path to the include folder of fast matrix market in makefile.
-3. Matlab (optional, used for comparison benchmarks)
-4. g++ (version 12 or 13)
-5. Intel c++ compiler (icpx or similar, 2024 version) for compiling intel MKL code, which is used by the solver. This is optional and only required if you want to run the complete factorize + solve pipeline in the experiment folder (CPU).
-6. CUDA (12.4) for running GPU experiments.
+1. Linux OS (maybe MacOS, not tested yet).
+2. Julia programming language is required to run some matrix preprocessing step. The instructions for download can be found on: [Julia Programming Language](https://github.com/JuliaLang/julia).
+3. [Fast matrix market](https://github.com/alugowski/fast_matrix_market) is required for reading in matrix market files. This package can be used as a template based library, which means no compilation is needed. The files can be directly included and used. Later on, user will have to specify the path to the include folder of fast matrix market in makefile.
+4. Matlab (optional, used for comparison benchmarks)
+5. g++ (version 12 or 13)
+6. Intel c++ compiler (icpx or similar, 2024 version) for compiling intel MKL code, which is used by the solver. This is optional and only required if you want to run the complete factorize + solve pipeline in the experiment folder (CPU).
+7. CUDA (12.4) for running GPU experiments.
 
 
 
