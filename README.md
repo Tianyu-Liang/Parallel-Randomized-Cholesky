@@ -1,6 +1,6 @@
 # Software Needed
 1. Linux OS (maybe MacOS, not tested yet).
-2. Julia programming language is required to run some matrix preprocessing step. The instructions for download can be found on: [Julia Programming Language](https://github.com/JuliaLang/julia).
+2. Julia programming language is required to run some matrix preprocessing step. The instructions for download can be found on: [Julia Programming Language](https://github.com/JuliaLang/julia). We require the following Julia Packages: SparseArrays, MatrixMarket, LinearAlgebra, AMD, Random, Laplacians, and Metis.
 3. [Fast matrix market](https://github.com/alugowski/fast_matrix_market) is required for reading in matrix market files. This package can be used as a template based library, which means no compilation is needed. The user can simply clone the repo. Later on, user will have to specify the path to the include folder of fast matrix market in makefile.
 4. Matlab (optional, used for comparison benchmarks)
 5. g++ (version 12 or 13)
@@ -55,7 +55,7 @@ The above command factorizes the parabolic_fem-nnz-sorted matrix.
 You can repeat this experiment on other datasets with the suffix `-nnz-sorted.mtx` in the physics/ subdirectory. The arguments to the driver function are as follows:
 The first argument (`../physics/parabolic_fem/parabolic_fem-nnz-sorted.mtx` in the above example) is the matrix path. The second argument (`32` in above example) indicates the number of threads to use. The third argument indicates the location to write the computed factorization to. An empty string for the third argument tells the program to not write anything. The last flag `1` simply indicates that this matrix is not originally a Laplacian, and the true solution will need to be trimmed and converted. All input matrices in physics/ should be run with this flag set to 1.
 
-## Older readme stuff
+## Additional Information:
 
 "cpu_implementation" contains the cpu version of our code, and it contains only the factorization part. "experiment" folder contains the complete pipeline (factorization and solve on cpu). "gpu_implementation" contains the gpu code.
 
