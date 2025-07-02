@@ -8,7 +8,7 @@ NVCC = /usr/bin/g++
 
 
 CXXFLAGS =  -std=c++20 -O3 \
-		   -I/pscratch/sd/t/tianyul/fast_matrix_market/include/
+		   -I/global/u1/d/dtench/cholesky/fast_matrix_market/include
 
 LDFLAGS = -fopenmp \
           -L  -lm -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread 
