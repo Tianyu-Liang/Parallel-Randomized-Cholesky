@@ -752,18 +752,12 @@ int main(int argc, char* argv[]) {
         assert(false);
     }
     
-    printf("hi mom\n");
+    printf("hi\n");
 
 
   //  MPI_Finalize();
     return 0;
-    
-   
 
-     
-
-
-    
 }
 
 // export KMP_AFFINITY=norespect

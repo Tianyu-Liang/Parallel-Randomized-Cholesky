@@ -7,6 +7,23 @@
 // #include <cassert>
 // #include <math.h>
 
+template <typename type_int>
+void writeVectorToFile2(const std::vector<type_int>& vec, const std::string& filename) 
+{
+    std::ofstream outFile(filename);
+    
+    if (!outFile) {
+        std::cerr << "Error opening file: " << filename << std::endl;
+        return;
+    }
+    
+    for (const type_int& element : vec) {
+        outFile << element << "\n";
+    }
+    
+    outFile.close();
+}
+
 template <typename type_int, typename type_data>
 void remove_last_row_and_column(custom_space::sparse_matrix<type_int, type_data> &A) {
     // The matrix is assumed to be square.
@@ -253,6 +270,11 @@ void example_pcg_solver(custom_space::sparse_matrix<type_int, type_data> &A, cus
     mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, 1.0, A_handle, descr_A, x.data(), -1, b.data());
     printf("relative residual: %.12f\n", cblas_dnrm2(n, b.data(), 1) / norm_rhs);
     
+    //for (auto i : x) {
+    //    std::cout << i << ' ';
+    //}
+    writeVectorToFile2(x, "output.data");
+
 
     mkl_sparse_destroy(A_handle);
     mkl_sparse_destroy(M_handle);
