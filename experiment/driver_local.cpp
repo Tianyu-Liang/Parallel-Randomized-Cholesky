@@ -10,8 +10,35 @@ typedef int custom_idx;
 
 
 
+// for reading in jl columns in csv format
+template <typename type_int>
+void readVectorFromCSV(const std::string& filename, std::vector<type_int>& values) {
+    
+    std::ifstream file(filename);
 
+    if (!file.is_open()) {
+        throw std::runtime_error("Failed to open file: " + filename);
+    }
 
+    std::string line;
+    std::getline(file, line);
+
+    std::stringstream ss(line);
+    std::string token;
+// TODO: add error checking to make sure that we don't go over the bounds
+    while (std::getline(ss, token, ',')) {
+        try {
+            values.push_back(std::stof(token));
+        } catch (const std::invalid_argument& e) {
+            throw std::runtime_error("Invalid float value: " + token);
+        } catch (const std::out_of_range& e) {
+            throw std::runtime_error("Float value out of range: " + token);
+        }
+    }
+
+    file.close();
+    //return floats;
+}
 
 
 
@@ -448,7 +475,8 @@ bool compare(const Edge<int, double> &a, const Edge<int, double> &b)
 
 
 template <typename type_int, typename type_data>
-void factorization_driver(sparse_matrix_processor<type_int, type_data> &processor, type_int num_threads, char* path, bool is_graph)
+void factorization_driver(sparse_matrix_processor<type_int, type_data> &processor, type_int num_threads, char* path, bool is_graph, std::vector<type_data>& right_hand_side)
+//void factorization_driver(sparse_matrix_processor<type_int, type_data> &processor, type_int num_threads, char* path, bool is_graph)
 {
     assert(INT_MAX == 2147483647);
     int space_multiply_factor = 5;
@@ -718,7 +746,8 @@ void factorization_driver(sparse_matrix_processor<type_int, type_data> &processo
 
     if(num_threads == 32)
     {
-       example_pcg_solver(processor.mat, precond_M, diagonal_entries.data(), is_graph);
+       example_pcg_solver(processor.mat, precond_M, diagonal_entries.data(), is_graph, right_hand_side);
+       //example_pcg_solver(processor.mat, precond_M, diagonal_entries.data(), is_graph);
     }
     
     for(int li = 0; li < 10; li++)
@@ -737,22 +766,34 @@ int main(int argc, char* argv[]) {
     //compute_parmetis_ordering(argv[1]);
     printf("problem: %s\n", argv[1]);
     sparse_matrix_processor<custom_idx, double> processor(argv[1]);
+    //printf("DAVIDA %i\n", processor.mat.num_rows); // gives n +1 for some reason
+    auto nodes = processor.mat.num_rows - 1; 
+    std::vector<double> jl_col; // make empty vector of length n for jl sketch column
+
+    readVectorFromCSV("fake_jl.csv", jl_col);
+    //printf("vec length %i, first element %f\n", jl_col.size(), jl_col[0]);
+    /*
+    std::cout << '\n';
+    for (double i: jl_col) {
+        std::cout << i << ' ';
+    }
+    std::cout << '\n';
+    */
+
     
     if(argc == 4)
     {
-        factorization_driver<custom_idx, double>(processor, atoi(argv[2]), argv[3], 1);
+        factorization_driver<custom_idx, double>(processor, atoi(argv[2]), argv[3], 1, jl_col);
     }
     else if(argc > 4)
     {
-        factorization_driver<custom_idx, double>(processor, atoi(argv[2]), argv[3], 0);
+        factorization_driver<custom_idx, double>(processor, atoi(argv[2]), argv[3], 0, jl_col);
     }
     else
     {
         printf("argument count not correct\n");
         assert(false);
     }
-    
-    printf("hi\n");
 
 
   //  MPI_Finalize();
