@@ -40,6 +40,37 @@ void readVectorFromCSV(const std::string& filename, std::vector<type_int>& value
     //return floats;
 }
 
+template <typename type_int>
+void readValuesFromFile(const std::string& filename, std::vector<std::vector<type_int>>& values) {
+    std::ifstream file(filename);
+
+    if (!file.is_open()) {
+        throw std::runtime_error("Failed to open file: " + filename);
+    }
+
+    std::string line;
+
+    while (std::getline(file, line)) {
+        std::stringstream ss(line);
+        std::string token;
+        std::vector<type_int> lineFloats;
+
+        while (std::getline(ss, token, ',')) {
+            try {
+                lineFloats.push_back(std::stof(token));
+            } catch (const std::invalid_argument& e) {
+                throw std::runtime_error("Invalid float value: " + token);
+            } catch (const std::out_of_range& e) {
+                throw std::runtime_error("Float value out of range: " + token);
+            }
+        }
+
+        values.push_back(lineFloats);
+    }
+
+    file.close();
+}
+
 
 
 template <typename type_int>
@@ -475,7 +506,7 @@ bool compare(const Edge<int, double> &a, const Edge<int, double> &b)
 
 
 template <typename type_int, typename type_data>
-void factorization_driver(sparse_matrix_processor<type_int, type_data> &processor, type_int num_threads, char* path, bool is_graph, std::vector<type_data>& right_hand_side)
+void factorization_driver(sparse_matrix_processor<type_int, type_data> &processor, type_int num_threads, char* path, bool is_graph, std::vector<std::vector<type_data>>& jl_cols)
 //void factorization_driver(sparse_matrix_processor<type_int, type_data> &processor, type_int num_threads, char* path, bool is_graph)
 {
     assert(INT_MAX == 2147483647);
@@ -743,13 +774,18 @@ void factorization_driver(sparse_matrix_processor<type_int, type_data> &processo
     
 
     custom_space::sparse_matrix<type_int, type_data> precond_M(processor.mat.rows(), processor.mat.cols(), std::move(csr_val_host), std::move(csr_col_ind_host), std::move(csr_rowptr_host));
-
-    if(num_threads == 32)
-    {
-       example_pcg_solver(processor.mat, precond_M, diagonal_entries.data(), is_graph, right_hand_side);
-       //example_pcg_solver(processor.mat, precond_M, diagonal_entries.data(), is_graph);
-    }
     
+    auto num_solve = 1;
+    for (std::vector<double> right_hand_side: jl_cols){
+        printf("---------------Performing solve %i\n", num_solve);
+        num_solve++;
+        if(num_threads == 32)
+        {
+        example_pcg_solver(processor.mat, precond_M, diagonal_entries.data(), is_graph, right_hand_side);
+        //example_pcg_solver(processor.mat, precond_M, diagonal_entries.data(), is_graph);
+        }
+    }
+
     for(int li = 0; li < 10; li++)
     {
         printf("\n");
@@ -770,7 +806,7 @@ int main(int argc, char* argv[]) {
     auto nodes = processor.mat.num_rows - 1; 
     std::vector<double> jl_col; // make empty vector of length n for jl sketch column
 
-    readVectorFromCSV("fake_jl.csv", jl_col);
+    //readVectorFromCSV("fake_jl.csv", jl_col);
     //printf("vec length %i, first element %f\n", jl_col.size(), jl_col[0]);
     /*
     std::cout << '\n';
@@ -779,22 +815,32 @@ int main(int argc, char* argv[]) {
     }
     std::cout << '\n';
     */
-
+    std::vector<std::vector<double>> jl_cols;
+    readValuesFromFile("fake_jl_multi.csv", jl_cols);
     
+    /*
+    for (std::vector<double> i: test_cols) {
+        for (double j: i){
+            std::cout << j << ' ';
+        }
+        std::cout << '\n';
+    }
+    */
+
+
     if(argc == 4)
     {
-        factorization_driver<custom_idx, double>(processor, atoi(argv[2]), argv[3], 1, jl_col);
+        factorization_driver<custom_idx, double>(processor, atoi(argv[2]), argv[3], 1, jl_cols);
     }
     else if(argc > 4)
     {
-        factorization_driver<custom_idx, double>(processor, atoi(argv[2]), argv[3], 0, jl_col);
+        factorization_driver<custom_idx, double>(processor, atoi(argv[2]), argv[3], 0, jl_cols);
     }
     else
     {
         printf("argument count not correct\n");
         assert(false);
     }
-
 
   //  MPI_Finalize();
     return 0;
