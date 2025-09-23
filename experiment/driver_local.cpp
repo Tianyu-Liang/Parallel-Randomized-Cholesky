@@ -779,12 +779,12 @@ void factorization_driver(sparse_matrix_processor<type_int, type_data> &processo
     for (std::vector<double> right_hand_side: jl_cols){
         printf("---------------Performing solve %i\n", num_solve);
         num_solve++;
-        if(num_threads == 32)
-        {
+//        if(num_threads == 32)
+//       {
         example_pcg_solver(processor.mat, precond_M, diagonal_entries.data(), is_graph, right_hand_side);
         //example_pcg_solver(processor.mat, precond_M, diagonal_entries.data(), is_graph);
         }
-    }
+//    }
 
     for(int li = 0; li < 10; li++)
     {

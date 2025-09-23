@@ -21,7 +21,7 @@ LDFLAGS = -fopenmp \
 
 
 
-TARGET = driver
+TARGET = driver.o
 SRC = driver_local.cpp
 HEADERS = pre_process.hpp auxilliary.hpp custom_cg.hpp
 
