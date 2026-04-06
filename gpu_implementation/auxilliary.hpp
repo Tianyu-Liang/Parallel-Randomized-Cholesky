@@ -600,7 +600,7 @@ __forceinline__ __device__ bool compare_row(const void* a, const void* b) {
     return o_a->row < o_b->row;
 }
 
-__forceinline__ __device__ bool compare_row_reference(Output<int, double> &a, Output<int, double> &b) {
+__forceinline__ __device__ bool compare_row_reference(const Output<int, double> &a, const Output<int, double> &b) {
 
 
     return a.row < b.row;
@@ -615,7 +615,7 @@ __forceinline__ __device__ bool compare_value(const void* a, const void* b) {
     //return (o_a->value < o_b->value);
 }
 
-__forceinline__ __device__ bool compare_value_reference(Output<int, double> &a, Output<int, double> &b) {
+__forceinline__ __device__ bool compare_value_reference(const Output<int, double> &a, const Output<int, double> &b) {
 
 
     return a.value < b.value;
