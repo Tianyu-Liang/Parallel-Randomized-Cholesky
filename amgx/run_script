@@ -9,7 +9,7 @@ examples/amgx_capi -m ../physics/poisson_contrast_3D/poisson_contrast_3D-hypre.m
 examples/amgx_capi -m ../physics/spe16m/spe16m-hypre.mtx -c ../src/configs/PCG_V.json
 
 
-examples/amgx_capi -m ../data/GAP-road/GAP-road-hypre.mtx -c ../src/configs/PCG_V.json
+examples/amgx_capi -m ../data/GAP-road/GAP-road-hypre.mtx -c ../src/configs/AMG_CLASSICAL_CG.json
 #examples/amgx_capi -m ../data/com-LiveJournal/com-LiveJournal-hypre.mtx -c ../src/configs/PCG_V.json
 examples/amgx_capi -m ../data/europe_osm/europe_osm-hypre.mtx -c ../src/configs/AMG_CLASSICAL_CG.json
 examples/amgx_capi -m ../data/delaunay_n24/delaunay_n24-hypre.mtx -c ../src/configs/AMG_CLASSICAL_CG.json
