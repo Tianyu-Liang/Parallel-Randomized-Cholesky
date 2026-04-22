@@ -63,7 +63,7 @@ void generate_zero_sum_vector(type_data *h_vec, size_t n, unsigned long seed)
 }
 
 template <typename type_int, typename type_data>
-void example_pcg_solver(custom_space::sparse_matrix<type_int, type_data> &A, custom_space::sparse_matrix<type_int, type_data> &M, bool is_graph) {
+void example_pcg_solver(custom_space::sparse_matrix<type_int, type_data> &A, custom_space::sparse_matrix<type_int, type_data> &M, bool is_graph, int max_iter = 1000, double rel_tol = 1e-7) {
 
     if(!is_graph)
     {
@@ -127,13 +127,13 @@ void example_pcg_solver(custom_space::sparse_matrix<type_int, type_data> &A, cus
     ipar[0] = n;       // size
     ipar[1] = 6;       // display error option
     ipar[3] = 0;       // iteration counter
-    ipar[4] = 1000;    // max iterations
+    ipar[4] = max_iter;    // max iterations
     ipar[7] = 1;        // 0 means no check, otherwise means internally check max
     ipar[8] = 0;       // 0 means no check, otherwise means internally check norm
     ipar[9] = 1;       // 0 means no check, otherwise means user check
     ipar[10] = 1;      // preconditioning enabled
 
-    dpar[0] = 5e-8; // tolerance
+    dpar[0] = rel_tol; // tolerance
 
 
 
@@ -261,7 +261,7 @@ void example_pcg_solver(custom_space::sparse_matrix<type_int, type_data> &A, cus
 
     double norm_rhs = cblas_dnrm2(n, b.data(), 1);
     mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, 1.0, A_handle, descr_A, x.data(), -1, b.data());
-    printf("relative residual: %.12f\n", cblas_dnrm2(n, b.data(), 1) / norm_rhs);
+    printf("relative residual: %.6e\n", cblas_dnrm2(n, b.data(), 1) / norm_rhs);
     
 
     mkl_sparse_destroy(A_handle);
@@ -340,9 +340,11 @@ int main(int argc, char *argv[])
     // should be stored in lower triangular csc format, converts it to a lower triangular csr format
     custom_space::sparse_matrix<int, double> M = read_in_factor<int, double>(argv[2]);
     bool is_graph = atoi(argv[3]);
+    int max_iter = (argc > 4) ? atoi(argv[4]) : 1000;
+    double rel_tol = (argc > 5) ? atof(argv[5]) : 1e-7;
 
-    
+
     printf("nnz: %d\n", processor.mat.nonZeros());
-    example_pcg_solver(processor.mat, M, is_graph);
+    example_pcg_solver(processor.mat, M, is_graph, max_iter, rel_tol);
     
 }

@@ -1,17 +1,40 @@
-examples/amgx_capi -m ../physics/parabolic_fem/parabolic_fem.mtx -c ../src/configs/PCG_V.json
-examples/amgx_capi -m ../physics/ecology1/ecology1.mtx -c ../src/configs/AMG_CLASSICAL_CG.json
-examples/amgx_capi -m ../physics/ecology2/ecology2.mtx -c ../src/configs/PCG_V.json
-examples/amgx_capi -m ../physics/apache2/apache2.mtx -c ../src/configs/PCG_V.json
-examples/amgx_capi -m ../physics/G3_circuit/G3_circuit.mtx -c ../src/configs/PCG_V.json
-examples/amgx_capi -m ../physics/uniform_3D/uniform_3D-hypre.mtx -c ../src/configs/PCG_V.json
-examples/amgx_capi -m ../physics/aniso_contrast_3D/aniso_contrast_3D-hypre.mtx -c ../src/configs/PCG_V.json
-examples/amgx_capi -m ../physics/poisson_contrast_3D/poisson_contrast_3D-hypre.mtx -c ../src/configs/PCG_V.json
-examples/amgx_capi -m ../physics/spe16m/spe16m-hypre.mtx -c ../src/configs/PCG_V.json
+# Run from AMGX build/ directory
+AMGX=examples/amgx_capi
+PCG_V=../src/configs/PCG_V.json
+AMG_CG=../src/configs/AMG_CLASSICAL_CG.json
+DATA=/pscratch/sd/t/tianyul/randla/graph_sparsify/data/amgx
 
+# Graph Laplacians
+printf '\n%.0s' {1..30}
+$AMGX -m $DATA/com-LiveJournal.mtx -c $PCG_V
+printf '\n%.0s' {1..30}
+$AMGX -m $DATA/GAP-road.mtx -c $AMG_CG
+printf '\n%.0s' {1..30}
+$AMGX -m $DATA/europe_osm.mtx -c $AMG_CG
+printf '\n%.0s' {1..30}
+$AMGX -m $DATA/delaunay_n24.mtx -c $AMG_CG
+printf '\n%.0s' {1..30}
+$AMGX -m $DATA/venturiLevel3.mtx -c $PCG_V
+printf '\n%.0s' {1..30}
+$AMGX -m $DATA/belgium_osm.mtx -c $AMG_CG
 
-examples/amgx_capi -m ../data/GAP-road/GAP-road-hypre.mtx -c ../src/configs/AMG_CLASSICAL_CG.json
-#examples/amgx_capi -m ../data/com-LiveJournal/com-LiveJournal-hypre.mtx -c ../src/configs/PCG_V.json
-examples/amgx_capi -m ../data/europe_osm/europe_osm-hypre.mtx -c ../src/configs/AMG_CLASSICAL_CG.json
-examples/amgx_capi -m ../data/delaunay_n24/delaunay_n24-hypre.mtx -c ../src/configs/AMG_CLASSICAL_CG.json
-examples/amgx_capi -m ../data/venturiLevel3/venturiLevel3-hypre.mtx -c ../src/configs/PCG_V.json
-examples/amgx_capi -m ../data/belgium_osm/belgium_osm-hypre.mtx -c ../src/configs/AMG_CLASSICAL_CG.json
+# Physics matrices
+printf '\n%.0s' {1..30}
+$AMGX -m $DATA/parabolic_fem.mtx -c $PCG_V
+printf '\n%.0s' {1..30}
+$AMGX -m $DATA/ecology1.mtx -c $AMG_CG
+printf '\n%.0s' {1..30}
+$AMGX -m $DATA/ecology2.mtx -c $PCG_V
+printf '\n%.0s' {1..30}
+$AMGX -m $DATA/apache2.mtx -c $PCG_V
+printf '\n%.0s' {1..30}
+$AMGX -m $DATA/G3_circuit.mtx -c $PCG_V
+printf '\n%.0s' {1..30}
+$AMGX -m $DATA/spe16m.mtx -c $PCG_V
+printf '\n%.0s' {1..30}
+$AMGX -m $DATA/uniform_3D.mtx -c $PCG_V
+printf '\n%.0s' {1..30}
+$AMGX -m $DATA/aniso_contrast_3D.mtx -c $PCG_V
+printf '\n%.0s' {1..30}
+$AMGX -m $DATA/poisson_contrast_3D.mtx -c $PCG_V
+printf '\n%.0s' {1..30}

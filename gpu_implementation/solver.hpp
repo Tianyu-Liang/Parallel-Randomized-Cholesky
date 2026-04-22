@@ -428,20 +428,23 @@ int prepare_and_solve(sparse_matrix_device<type_int, type_data> &laplacian, type
    
     
     
-    if(physics)
-    {
-        // use zero sum vector as rightside
-        generate_zero_sum_vector<type_data>(rightside, num_cols, 0);
-        cudaMemcpy(rightside_device, rightside, num_cols * sizeof(type_data), cudaMemcpyHostToDevice);
-    }
-    else
-    {
-         // use spmv to generate rightside
-        cudaMemset(rightside_device, 0, num_cols);
-        CHECK_CUSPARSE( cusparseSpMV(cusparseHandle, CUSPARSE_OPERATION_NON_TRANSPOSE,
-                                    &one, laplacian_des, vec_init_left, &zero, vec_right, CUDA_R_64F,
-                                    CUSPARSE_SPMV_ALG_DEFAULT, buffer_lap) );
-    }
+    // use random zero-sum vector as rightside for both physics and graph
+    generate_zero_sum_vector<type_data>(rightside, num_cols, 0);
+    cudaMemcpy(rightside_device, rightside, num_cols * sizeof(type_data), cudaMemcpyHostToDevice);
+    // if(physics)
+    // {
+    //     // use zero sum vector as rightside
+    //     generate_zero_sum_vector<type_data>(rightside, num_cols, 0);
+    //     cudaMemcpy(rightside_device, rightside, num_cols * sizeof(type_data), cudaMemcpyHostToDevice);
+    // }
+    // else
+    // {
+    //      // use spmv to generate rightside
+    //     cudaMemset(rightside_device, 0, num_cols);
+    //     CHECK_CUSPARSE( cusparseSpMV(cusparseHandle, CUSPARSE_OPERATION_NON_TRANSPOSE,
+    //                                 &one, laplacian_des, vec_init_left, &zero, vec_right, CUDA_R_64F,
+    //                                 CUSPARSE_SPMV_ALG_DEFAULT, buffer_lap) );
+    // }
 
 
     /*

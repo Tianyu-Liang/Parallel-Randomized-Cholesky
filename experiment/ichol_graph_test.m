@@ -40,17 +40,18 @@ for i = 1 : length(mat_list)
     disp("problem nnz: " + nnz(A) +  ", factor nnz: " + nnz(L1));
     disp("nnz ratio: " + 2 * nnz(L1) / nnz(A));
     
-    %mmwrite(write_list(i) + "_ic_amd.mtx", L1);
-    %b = A * rand(size(A, 1), 1);
-    %[x1,fl1,rr1,it1,rv1] = pcg(A,b,1e-6,100,L1,L1');
-   % x = pcg(A,b,1e-6,1000,L1,L1');
-    %disp(norm(A * x - b) / norm(b))
+    mmwrite(write_list(i) + "_ic_amd.mtx", L1);
+    % b = A * rand(size(A, 1), 1);
+    % b = rand(size(A, 1), 1);
+    % [x1,fl1,rr1,it1,rv1] = pcg(A,b,1e-6,100,L1,L1');
+    % x = pcg(A,b,1e-6,1000,L1,L1');
+    % disp(norm(A * x - b) / norm(b))
 
 end
 
 % got here\n
 % Elapsed time is 0.127277 seconds.
-% problem nnz: 4995991, factor nnz: 6093533
+% problem nnz: 4996000, factor nnz: 6093533
 % nnz ratio: 2.4394
 % got here\n
 % Elapsed time is 1.675887 seconds.

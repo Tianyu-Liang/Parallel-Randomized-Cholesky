@@ -1,90 +1,87 @@
-# Software Needed
-1. Linux OS (maybe MacOS, not tested yet).
-2. Julia programming language is required to run some matrix preprocessing step. The instructions for download can be found on: [Julia Programming Language](https://github.com/JuliaLang/julia). We require the following Julia Packages: SparseArrays, MatrixMarket, LinearAlgebra, AMD, Random, Laplacians, and Metis.
-3. [Fast matrix market](https://github.com/alugowski/fast_matrix_market) is required for reading in matrix market files. This package can be used as a template based library, which means no compilation is needed. The user can simply clone the repo. Later on, user will have to specify the path to the include folder of fast matrix market in makefile.
-4. Matlab (optional, used for comparison benchmarks)
-5. g++ (version 12 or 13)
-6. Intel c++ compiler (icpx or similar, 2024 version) for compiling intel MKL code, which is used by the solver. This is optional and only required if you want to run the complete factorize + solve pipeline in the experiment folder (CPU).
-7. CUDA (12.4) for running GPU experiments. An example download instruction for version 12.4 can be found here: [cuda toolkit](https://developer.nvidia.com/cuda-12-4-0-download-archive). Other versions starting with 12 may also work.
-
-
-
-
 # Instructions
-We provide a series of instructions for running our implementation for a subset of the experiments found in [the paper](https://arxiv.org/abs/2505.02977). These instructions will show you how to download some of the datasets, preprocess them, and run example versions of our experiments.
 
-## Downloading and including fast matrix market
-In the top repo directory, run
-```git clone https://github.com/alugowski/fast_matrix_market.git```
+## Overview
 
-## Downloading datasets
-Run our demo setup script to download some physics datasets, and generate some others:
+- `cpu_implementation/` — CPU factorization only (ParAC).
+- `experiment/` — Complete CPU pipeline (factorization + PCG solve). Also contains `independent_cg` for solving with a pre-computed preconditioner. Requires MKL.
+- `gpu_implementation/` — GPU factorization + solve. Has separate drivers for graph Laplacians (`driver.cu`) and physics/SDDM matrices (`driver_physics.cu`).
+- `data/` — Scripts and instructions for downloading/generating the 15 benchmark matrices. See `data/README.md`.
+- `hypre/` and `amgx/` — Run scripts and READMEs for the baseline solvers (BoomerAMG and AMGX).
 
-```sh demo_setup.sh```
+## Prerequisites
 
-After this is done, you will have a physics/ subdirectory containing the preprocessed physics datasets.
+1. Download [fast_matrix_market](https://github.com/alugowski/fast_matrix_market) and update the include path in the makefiles.
+2. Download the relevant matrices from SuiteSparse and place them into folders. For instance, `parabolic_fem` should be at `data/parabolic_fem/parabolic_fem.mtx`.
+3. Use `write_graph.jl` from `cpu_implementation/` to produce reordered matrices. See the `produce_*.jl` files for examples.
 
-## Running CPU factorization experiment
+**Make sure to create a folder for each matrix. Folders must be manually created for matrices that are not from SuiteSparse (e.g., 3D uniform Poisson).**
 
-```cd cpu_implementation```
+## CPU factorization (`cpu_implementation/driver`)
 
-Open the makefile for editing:
-
-`nano makefile`
-
-and edit the following line:
-
-`CXXFLAGS =  -std=c++20 -O3 \
-		   -I/pscratch/sd/t/tianyul/fast_matrix_market/include/`
-     
-to 
-
-`CXXFLAGS =  -std=c++20 -O3 \
-		   -I[global path to top repo directory]/Parallel-Randomized-Cholesky/fast_matrix_market/include`
-
-Save the makefile and exit nano. Then compile:
-
-```make```
-
-Now you are ready to run the experiment:
-
-```./driver ../physics/parabolic_fem/parabolic_fem-nnz-sorted.mtx 32 "" 1```
-
-The above command factorizes the parabolic_fem-nnz-sorted matrix.
-
-You can repeat this experiment on other datasets with the suffix `-nnz-sorted.mtx` in the physics/ subdirectory. The arguments to the driver function are as follows:
-The first argument (`../physics/parabolic_fem/parabolic_fem-nnz-sorted.mtx` in the above example) is the matrix path. The second argument (`32` in above example) indicates the number of threads to use. The third argument indicates the location to write the computed factorization to. An empty string for the third argument tells the program to not write anything. The last flag `1` simply indicates that this matrix is not originally a Laplacian, and the true solution will need to be trimmed and converted. All input matrices in physics/ should be run with this flag set to 1.
-
-## Additional Information:
-
-"cpu_implementation" contains the cpu version of our code, and it contains only the factorization part. "experiment" folder contains the complete pipeline (factorization and solve on cpu). "gpu_implementation" contains the gpu code.
-
-
-To run the code, we would first need to download the relevant matrices from suitesparse and put them into a folder (e.g. data, physics). For instance, the location of "parabolic_fem" should be "data/parabolic_fem/parabolic_fem.mtx".
-Then one should use write_graph.jl from "cpu_implementation" to write down the reordered matrices. See the jl files starting with the prefix "produce" for examples on how to create those matrices.
-**Make sure to create a folder for each matrix (i.e. parabolic_fem folder would contain all variations of the parabolic_fem matrices). Folders must be manually created for matrices that are not from SuiteSparse (i.e. 3D uniform poisson, etc.). The folder must exist before running the julia script, otherwise the run might fail.**
-
-Lastly, fill out the correct paths in the makefile and compile the code. 
-
-**CPU**:
-For matrices that are not originally Laplacian (i.e. sddm converted to a laplacian by appending a row and a column to the end), run with 
-```console
-$ ./driver path/to/parabolic_fem-nnz-sorted.mtx 32 "" 1
+For physics/SDDM matrices (not originally a Laplacian — appends a row/column to make it one):
+```bash
+./driver path/to/matrix-amd.mtx 32 "" 1
 ```
-The second input is the matrix path. The third input indicates the number of threads to use. The 4th input indicates the location to write the computed factorization to. An empty string for the 4th input tells the program to not write anything. The last flag "1" simply indicates that this matrix is not originally a Laplacian, and the true solution will need to be trimmed and converted. 
-If the matrix is already a graph Laplacian, then simply remove the last flag, such as: 
-```console
-$ ./driver path/to/parabolic_fem-nnz-sorted.mtx 32 ""
+
+For graph Laplacians (already a Laplacian, no augmentation needed):
+```bash
+./driver path/to/matrix-amd.mtx 32 ""
 ```
-Also see physics_test_nnz_sort.sh and similar files for examples.
 
-**The code in experiment folder requires MKL. On Perlmutter, the code can be compiled by using "module load intel" to load the intel paths.**
+Arguments:
+1. Matrix file path (.mtx)
+2. Number of threads
+3. Output path for the computed factorization (empty string `""` = don't write)
+4. (Optional) Any value here triggers physics mode (the matrix will be augmented and trimmed). Omit for graph Laplacians.
 
-**GPU**
-The there are two relevant files in gpu_implementation that handles both the natural Laplacian (driver.cu) and converted SDDM to Laplacians (driver_physics.cu) respectively. One can change which file to compile in the makefile. An example run is the follow:
-```console
-$ ./driver path/to/parabolic_fem-nnz-sorted.mtx 512 1 7e-7
+See `experiment/physics_test_amd.sh`, `experiment/graph_test_amd.sh`, and `experiment/spe_test_amd.sh` for examples.
+
+## CPU factorization + solve (`experiment/driver`)
+
+Same interface as the CPU factorization driver above. The difference is that this version also runs the PCG solve after factorization.
+
+**Requires MKL. On Perlmutter, use `module load intel` to set up the paths.**
+
+## Independent CG solver (`experiment/independent_cg`)
+
+Solves with a pre-computed incomplete Cholesky preconditioner using MKL's CG:
+```bash
+./independent_cg path/to/matrix.mtx path/to/preconditioner.mtx is_graph [max_iter] [rel_tol]
 ```
-The 3rd input is the number of thread blocks to use. The fourth input indicates whether the solver part should be ran (0 indicates skip, 1 indicates run). The last input is a number in scientific notation that indicates the desired accuracy of the solution.
-Also see test_script_physics_nnz_sort and similar files for examples.
 
+Arguments:
+1. Matrix file path (.mtx)
+2. Preconditioner factor file path (.mtx)
+3. `1` for graph Laplacian, `0` for physics/SDDM (physics mode removes the last row/column)
+4. (Optional) Maximum iterations (default: 1000)
+5. (Optional) Relative tolerance (default: 1e-7)
+
+Examples:
+```bash
+# Graph problem with custom max_iter and tolerance
+./independent_cg "../data/europe_osm/europe_osm-amd.mtx" "../data/europe_osm/_ic_amd.mtx" 1 10000 5e-7
+
+# Physics problem with defaults
+./independent_cg "../physics/parabolic_fem/parabolic_fem-amd.mtx" "../physics/parabolic_fem/_ic_amd.mtx" 0
+```
+
+See `experiment/ichol_graph.sh` and `experiment/ichol_physics.sh` for examples.
+
+## GPU (`gpu_implementation/`)
+
+There are two drivers:
+- `driver.cu` — for graph Laplacians
+- `driver_physics.cu` — for physics/SDDM matrices
+
+Switch which one to compile in the makefile. Both have the same interface:
+```bash
+./driver path/to/matrix-nnz-sorted.mtx 512 1 7e-7
+```
+
+Arguments:
+1. Matrix file path (.mtx)
+2. Number of thread blocks
+3. Whether to run the solve phase (`0` = skip, `1` = run)
+4. Target relative tolerance (scientific notation)
+
+See `gpu_implementation/physics_test_nnz_sort.sh` for examples.
