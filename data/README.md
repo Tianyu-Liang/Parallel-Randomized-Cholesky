@@ -51,7 +51,7 @@ bash download_matrices.sh
 This downloads:
 - Physics matrices from SuiteSparse to `physics/` (ecology1, ecology2, apache2, G3_circuit, parabolic_fem)
 - SPE matrices from Dropbox to `physics/spe*/`
-- Graph matrices should already be in `data/` (belgium_osm, europe_osm, etc.)
+- Graph matrices from SuiteSparse to `data/<matrix>/` (belgium_osm, europe_osm, com-LiveJournal, GAP-road, delaunay_n24, venturiLevel3)
 
 ### 2. Generate Julia physics matrices
 
