@@ -3,7 +3,7 @@
 # Run from the data/ directory: bash download_matrices.sh
 #
 # Matrices are split into three categories:
-#   1. Graph Laplacians (from SuiteSparse, pattern format - need Laplacian conversion)
+#   1. Graph matrices (from SuiteSparse, pattern/integer format - need Laplacian conversion)
 #   2. Physics matrices (from SuiteSparse, already have values)
 #   3. SPE matrix (from Dropbox)
 #
@@ -17,21 +17,34 @@ DATA_DIR=$(pwd)
 echo "=== Downloading matrices to $DATA_DIR ==="
 
 ###############################################################################
-# 1. Graph Laplacians from SuiteSparse (pattern symmetric)
+# 1. Graph matrices from SuiteSparse (pattern/integer symmetric)
 #    These are adjacency graphs. Use write_graph.jl to convert to Laplacians.
-#    Already downloaded: belgium_osm, europe_osm, com-LiveJournal, GAP-road,
-#                        delaunay_n24, venturiLevel3
 ###############################################################################
 
 echo ""
-echo "--- Graph matrices (already present, skipping) ---"
-for mat in belgium_osm europe_osm com-LiveJournal GAP-road delaunay_n24 venturiLevel3; do
-    if [ -d "$mat" ] && ls "$mat"/*.mtx &>/dev/null; then
-        echo "  $mat: already exists, skipping"
+echo "--- Graph matrices from SuiteSparse ---"
+
+download_graph_matrix() {
+    local group=$1
+    local mat=$2
+
+    if [ ! -f "$DATA_DIR/$mat/$mat.mtx" ]; then
+        echo "Downloading $mat..."
+        wget -q "https://suitesparse-collection-website.herokuapp.com/MM/$group/$mat.tar.gz" -O "$mat.tar.gz"
+        tar xzf "$mat.tar.gz" -C "$DATA_DIR/"
+        rm "$mat.tar.gz"
+        echo "  $mat done"
     else
-        echo "  WARNING: $mat directory missing or has no .mtx files"
+        echo "  $mat: already exists, skipping"
     fi
-done
+}
+
+download_graph_matrix DIMACS10 belgium_osm
+download_graph_matrix DIMACS10 europe_osm
+download_graph_matrix SNAP com-LiveJournal
+download_graph_matrix GAP GAP-road
+download_graph_matrix DIMACS10 delaunay_n24
+download_graph_matrix DIMACS10 venturiLevel3
 
 ###############################################################################
 # 2. Physics matrices from SuiteSparse
