@@ -713,7 +713,7 @@ bool compare(const Edge<int, double> &a, const Edge<int, double> &b)
 
 
 template <typename type_int, typename type_data>
-void factorization_driver(sparse_matrix_processor<type_int, type_data> &processor, type_int num_threads, char* path, bool is_graph)
+void factorization_driver(sparse_matrix_processor<type_int, type_data> &processor, type_int num_threads, char* path, bool is_graph, double tol = 1e-7, char* rhsfile = nullptr)
 {
     assert(INT_MAX == 2147483647);
     int space_multiply_factor = 5;
@@ -1032,7 +1032,7 @@ void factorization_driver(sparse_matrix_processor<type_int, type_data> &processo
 
     if(num_threads == 32)
     {
-       example_pcg_solver(processor.mat, precond_M, diagonal_entries.data(), is_graph);
+       example_pcg_solver(processor.mat, precond_M, diagonal_entries.data(), is_graph, 1000, tol, rhsfile);
     }
     
     for(int li = 0; li < 10; li++)
@@ -1280,19 +1280,22 @@ int main(int argc, char* argv[]) {
     printf("problem: %s\n", argv[1]);
     sparse_matrix_processor<custom_idx, double> processor(argv[1]);
     
-    if(argc == 4)
+    // Args: <matrix> <num_threads> <path> <is_graph> [tol] [rhsfile]
+    //   is_graph : 1 = graph Laplacian, 0 = physics/SDDM (physics removes the appended last row/col).
+    //   tol      : optional relative tolerance for the PCG solve (default 1e-7).
+    //   rhsfile  : optional. If given, the RHS is read from this file (HyPre IJ vector format:
+    //              header line, then "idx val" per line). If omitted, a zero-sum random RHS is used.
+    //              NOTE: the zero-sum random RHS is only valid for CONNECTED graphs; for disconnected
+    //              graphs supply rhsfile (b = A*x, guaranteed in the image). See README.
+    if(argc < 5)
     {
-        factorization_driver<custom_idx, double>(processor, atoi(argv[2]), argv[3], 1);
-    }
-    else if(argc > 4)
-    {
-        factorization_driver<custom_idx, double>(processor, atoi(argv[2]), argv[3], 0);
-    }
-    else
-    {
-        printf("argument count not correct\n");
+        printf("usage: driver <matrix> <num_threads> <path> <is_graph:1=graph|0=physics> [tol] [rhsfile]\n");
         assert(false);
     }
+    bool is_graph = atoi(argv[4]);
+    double tol = (argc > 5) ? atof(argv[5]) : 1e-7;
+    char* rhsfile = (argc > 6) ? argv[6] : nullptr;
+    factorization_driver<custom_idx, double>(processor, atoi(argv[2]), argv[3], is_graph, tol, rhsfile);
     
 
 

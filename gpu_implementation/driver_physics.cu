@@ -1089,7 +1089,7 @@ __global__ void perform_factorization_device(const sparse_matrix_device<type_int
                    
                 
                     
-                    int available_status = atomicExch(&device_edge_map[slot].availability, 1);
+                    int available_status = atomicCAS(&device_edge_map[slot].availability, 0, 1);
                     // cuda::atomic_ref<int, cuda::thread_scope_device> at_avail_acq(device_edge_map[slot].availability);
                     // int available_status = at_avail_acq.exchange(1, cuda::memory_order_acquire);
               
@@ -1135,9 +1135,6 @@ __global__ void perform_factorization_device(const sparse_matrix_device<type_int
                     else
                     {
                         
-                        atomicExch(&device_edge_map[slot].availability, 2);
-                        // cuda::atomic_ref<int, cuda::thread_scope_device> at_avail_rel(device_edge_map[slot].availability);
-                        // at_avail_rel.exchange(2, cuda::memory_order_release);
                         slot = (slot + 1) % map_size;
                         
 
@@ -1738,7 +1735,7 @@ void trim_input_laplacian_device(sparse_matrix_device<type_int, type_data> &spma
 
 
 template <typename type_int, typename type_data>
-void factorization_driver(sparse_matrix_processor<type_int, type_data> &processor, int num_blocks, bool check_solve, double tolerance)
+void factorization_driver(sparse_matrix_processor<type_int, type_data> &processor, int num_blocks, bool check_solve, double tolerance, char* rhsfile = nullptr, int pool_multiplier = 4)
 {
     // this is a warmp up run
     int *dummy_pt;
@@ -1747,7 +1744,8 @@ void factorization_driver(sparse_matrix_processor<type_int, type_data> &processo
 
 
     auto start = std::chrono::high_resolution_clock::now();
-    int edge_pool_size = std::round(processor.mat.nonZeros() * 4);
+    int edge_pool_size = std::round(processor.mat.nonZeros() * (double)pool_multiplier);   // capacity = pool_multiplier x nnz (argv[6], default 4)
+    printf("edge pool: %dx nnz = %d entries (raise argv[6] if a dense matrix overflows this)\n", pool_multiplier, edge_pool_size);
     
 
     printf("Edge size: %ld\n", sizeof(Edge<type_int, type_data>{}));
@@ -2087,7 +2085,7 @@ void factorization_driver(sparse_matrix_processor<type_int, type_data> &processo
         duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
         std::cout << "total conversion time: " << duration.count() << " milliseconds" << std::endl;
 
-        prepare_and_solve(spmat_device, csr_rowptr_device, csr_val_device, csr_col_ind_device, diagonal_device, tolerance, 1, total_nnz, removal);
+        prepare_and_solve(spmat_device, csr_rowptr_device, csr_val_device, csr_col_ind_device, diagonal_device, tolerance, 1, total_nnz, removal, rhsfile);
 
    
         
@@ -2125,8 +2123,14 @@ int main(int argc, char* argv[]) {
     //compute_parmetis_ordering(argv[1]);
     printf("problem: %s\n", argv[1]);
     sparse_matrix_processor<custom_idx, double> processor(argv[1]);
-    
-    factorization_driver<custom_idx, double>(processor, std::stoi(argv[2]), std::stoi(argv[3]), std::atof(argv[4]));
+
+    // optional argv[5]: rhsfile (HyPre IJ vector) so the GPU solves the same b=M*g as HyPre/AMGX.
+    //                   Pass "" to skip the rhsfile while still setting argv[6].
+    // optional argv[6]: factorization edge-pool capacity as a multiple of nnz (default 4). Bump it
+    //                   for dense matrices whose factor overflows the default 4x pool (crash/hang).
+    char* rhsfile = (argc > 5 && argv[5][0]) ? argv[5] : nullptr;
+    int pool_mult = (argc > 6) ? std::stoi(argv[6]) : 4;
+    factorization_driver<custom_idx, double>(processor, std::stoi(argv[2]), std::stoi(argv[3]), std::atof(argv[4]), rhsfile, pool_mult);
 
     
 

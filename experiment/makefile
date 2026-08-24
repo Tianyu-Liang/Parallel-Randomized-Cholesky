@@ -1,25 +1,12 @@
-#NVCC = /global/common/software/nersc9/intel/oneapi/compiler/2024.1/bin/icpx
-NVCC = /usr/bin/g++
-#NVCC = /opt/intel/oneapi/compiler/2023.2.0/linux/bin/icpx
-#NVCC = /opt/AMD/aocc-compiler-3.2.0.sles15/bin/clang++
-#CUDAPATH = /opt/nvidia/hpc_sdk/Linux_x86_64/23.9/cuda/12.2/lib64
+CXX ?= g++
+FMM_INCLUDE ?=
+MKL_INCLUDE ?=
+MKL_LIB_DIR ?=
 
-
-
-
-CXXFLAGS =  -std=c++20 -O3 \
-		   -I/pscratch/sd/t/tianyul/fast_matrix_market/include/
-
-LDFLAGS = -fopenmp \
-          -L  -lm -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread 
-		  
-#-L$(CUDAPATH)
-# -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread 
-# -lgomp 
-#CUDAFLAGS = -arch=sm_80 -lcusparse -lcudart -lcublas 
-
-
-
+CPPFLAGS += $(if $(FMM_INCLUDE),-I$(FMM_INCLUDE)) $(if $(MKL_INCLUDE),-I$(MKL_INCLUDE))
+CXXFLAGS ?= -std=c++20 -O3
+LDFLAGS += -fopenmp $(if $(MKL_LIB_DIR),-L$(MKL_LIB_DIR))
+LDLIBS += -lm -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread
 
 TARGET = driver
 SRC = driver_local.cpp
@@ -32,11 +19,11 @@ TEST_HEADERS = pre_process.hpp
 all: $(TARGET) $(TEST)
 
 $(TARGET): $(SRC) $(HEADERS)
-	$(NVCC) $(CXXFLAGS)  -o $(TARGET) $(SRC) $(LDFLAGS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -o $(TARGET) $(SRC) $(LDFLAGS) $(LDLIBS)
 
 $(TEST): $(TEST_SRC) $(TEST_HEADERS)
-	$(NVCC) $(CXXFLAGS) -o $(TEST) $(TEST_SRC) $(LDFLAGS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -o $(TEST) $(TEST_SRC) $(LDFLAGS) $(LDLIBS)
 
 
 clean:
-	rm -f $(TARGET)
+	rm -f $(TARGET) $(TEST)

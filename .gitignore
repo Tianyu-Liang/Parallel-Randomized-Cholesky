@@ -1,0 +1,40 @@
+# Compiled executables
+/cpu_implementation/driver
+/experiment/driver
+/experiment/independent_cg
+/gpu_implementation/driver
+/gpu_implementation/driver_physics
+
+# Downloaded/generated matrix data and solver artifacts
+/physics/
+*.mtx
+*.mm
+*.00000
+*.amgx
+*.row
+*.log
+
+# Intermediate result tables (the two publication summaries are kept explicitly)
+/data/SUMMARY_*.txt
+/data/chimera_amd/SUMMARY_*.txt
+!/data/chimera_amd/SUMMARY_ac_vs_hypre_tol1e-8.txt
+/data/chimera_ij/SUMMARY_*.txt
+/data/chimera_nnzsort/SUMMARY_*.txt
+!/data/chimera_nnzsort/SUMMARY_amgx_vs_gpu_tol1e-8.txt
+/data/ipm_amd/
+/data/ipm_ij/
+
+# Language/tool caches
+__pycache__/
+*.py[cod]
+
+# Local paper and review drafts
+/GPU_Random_Cholesky_v*.pdf
+/GPU_Random_Cholesky_v*.txt
+/current_rebuttal.md
+/long.md
+/new_SC_review
+/old_SC_review
+/old_ppopp_review
+/rebuttal_blue_comment
+/rebuttal_chimera_robustness.md

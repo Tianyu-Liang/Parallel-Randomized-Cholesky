@@ -1,9 +1,10 @@
 # Data Preparation for Solver Benchmarks
 
-This directory contains scripts to download matrices and generate input files
-for hypre (IJ format) and AMGX (MTX format).
+This directory contains scripts to download matrices, generate reordered ParAC inputs,
+and generate matching input files for Hypre (IJ format) and AMGX (MTX format). It also
+contains the randomized Chimera robustness experiment and optional IPM utilities.
 
-## Matrices
+## Original benchmark matrices
 
 15 test matrices split into two categories:
 
@@ -39,7 +40,7 @@ Graph Laplacian construction:
 
 ## Step-by-step reproduction
 
-All commands below assume you are in the `graph_sparsify/` directory.
+All commands below assume you are in the repository root unless a command changes directory.
 
 ### 1. Download matrices
 
@@ -81,17 +82,72 @@ This creates:
 - `data/hypre/` — IJ format matrix (`.00000`) and RHS (`_rhs.00000`) files
 - `data/amgx/` — MTX files with embedded RHS (`%%AMGX rhs` header)
 
+These generated files are intentionally ignored by Git.
+
 Processing details:
 - **Physics matrices**: used directly (positive diagonal, negative off-diagonal)
 - **SPE matrices**: all values negated (original has negative diagonal, positive off-diagonal)
 - **Graph matrices**: Laplacian constructed from adjacency (degree on diagonal, -weight off-diagonal)
 - **RHS**: random uniform [0,1) then subtract mean to get zero-sum vector (MT19937, seed=0)
 
-### 4. Run solvers
+### 4. Generate reordered ParAC matrices
+
+The `cpu_implementation/produce_*.jl` scripts generate AMD, nnz-sorted, and random
+orderings. For example:
+
+```bash
+cd cpu_implementation
+julia produce_graph_amd.jl
+julia produce_physics_amd.jl
+julia produce_spe_amd.jl
+```
+
+The physics preparation functions append the ground node needed by the ParAC physics/SDDM
+drivers. See the root README for the augmented-Laplacian input convention.
+
+### 5. Run solvers
 
 See the dedicated READMEs for running instructions and scripts:
 - Hypre: [`hypre/README.md`](../hypre/README.md)
 - AMGX: [`amgx/README.md`](../amgx/README.md)
+
+## Randomized Chimera robustness experiment
+
+The Chimera experiment uses four randomized matrix families and 50 seeds per family. Full
+matrix definitions, ordering rules, dependencies, and generation commands are documented in
+[`CHIMERA_MATRICES.md`](CHIMERA_MATRICES.md).
+
+Generate an AMD-ordered sweep for CPU ParAC versus BoomerAMG:
+
+```bash
+cd data
+for family in uni_chimera wted_chimera uni_bndry_chimera wted_bndry_chimera; do
+  CHIMERA_ORDER=amd julia gen_chimera_sweep.jl "$family" 100000 1 50 chimera_amd
+done
+IJ=/path/to/hypre/src/test/ij ./run_ac_vs_hypre.sh chimera_amd
+```
+
+Generate an nnz-sorted sweep for GPU ParAC versus AMGX:
+
+```bash
+for family in uni_chimera wted_chimera uni_bndry_chimera wted_bndry_chimera; do
+  CHIMERA_ORDER=nnz julia gen_chimera_sweep.jl "$family" 100000 1 50 chimera_nnzsort
+done
+AMGX=/path/to/amgx_capi AMGX_LIB=/path/to/amgx/build ./run_amgx_vs_gpu.sh chimera_nnzsort
+```
+
+See [`amgx_vs_gpu_procedure.md`](amgx_vs_gpu_procedure.md) for the complete GPU workflow.
+The generated matrices, RHS files, AMGX conversions, per-seed rows, and logs are ignored.
+The compact summary tables retained for the repository are:
+
+- `chimera_amd/SUMMARY_ac_vs_hypre_tol1e-8.txt`
+- `chimera_nnzsort/SUMMARY_amgx_vs_gpu_tol1e-8.txt`
+
+## Optional IPM utilities
+
+The `convert_ipm_mm_to_ij.py`, `gen_ipm_amd.jl`, `run_ipm_hypre.sh`, and
+`sweep_ipm_hypre.sh` scripts support exploratory IPM-matrix runs. The large `ipmMat/`,
+`ipm_amd/`, and `ipm_ij/` artifacts are local generated data and are not committed.
 
 ## File format details
 

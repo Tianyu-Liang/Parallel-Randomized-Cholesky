@@ -1331,19 +1331,15 @@ int main(int argc, char* argv[]) {
     printf("problem: %s\n", argv[1]);
     sparse_matrix_processor<custom_idx, double> processor(argv[1]);
     
-    if(argc == 4)
+    // Args: <matrix> <num_threads> <output_path> <is_graph>
+    //   is_graph: 1 = graph Laplacian, 0 = physics/SDDM (consistent with experiment/driver and independent_cg)
+    if(argc < 5)
     {
-        factorization_driver<custom_idx, double>(processor, atoi(argv[2]), argv[3], 1);
-    }
-    else if(argc > 4)
-    {
-        factorization_driver<custom_idx, double>(processor, atoi(argv[2]), argv[3], 0);
-    }
-    else
-    {
-        printf("argument count not correct\n");
+        printf("usage: driver <matrix> <num_threads> <output_path> <is_graph:1=graph|0=physics>\n");
         assert(false);
     }
+    bool is_graph = atoi(argv[4]);
+    factorization_driver<custom_idx, double>(processor, atoi(argv[2]), argv[3], is_graph);
     
 
 

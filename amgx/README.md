@@ -8,15 +8,22 @@ Requires a GPU node (A100 80GB). Request an interactive session:
 salloc -N 1 -t 30 -C gpu -q interactive -A <account> --gpus=1
 ```
 
-AMGX build is at `/pscratch/sd/t/tianyul/amgx/amgnew/AMGX/build/`.
+Build AMGX separately and record its source/build location, for example:
+
+```bash
+export AMGX_ROOT=/path/to/AMGX
+```
 
 ## Running benchmarks
 
-The benchmark script is at `script_run.sh`. Run from the AMGX `build/` directory:
+From the ParAC repository root, `amgx/run_script` runs the original benchmark suite.
+Provide the AMGX executable and the two AMGX configuration files through environment variables:
 
 ```bash
-cd /pscratch/sd/t/tianyul/amgx/amgnew/AMGX/build
-bash /pscratch/sd/t/tianyul/randla/graph_sparsify_fresh/amgx/script_run.sh
+AMGX="$AMGX_ROOT/build/examples/amgx_capi" \
+PCG_V="$AMGX_ROOT/src/configs/PCG_V.json" \
+AMG_CG="$AMGX_ROOT/src/configs/AMG_CLASSICAL_CG.json" \
+bash amgx/run_script
 ```
 
 This runs all 15 matrices with two configs:
@@ -36,16 +43,32 @@ Both configs use tolerance 1e-6, max 200 iterations.
 
 Matrix files (MTX with embedded RHS) are in:
 ```
-/pscratch/sd/t/tianyul/randla/graph_sparsify/data/amgx/
+data/amgx/
 ```
 
-See `data/README.md` for how to regenerate them.
+The runner derives this path from the repository automatically; override it with `DATA` if
+needed. See [`data/README.md`](../data/README.md) for how to regenerate the inputs.
 
 ## Running a single matrix
 
 ```bash
-cd /pscratch/sd/t/tianyul/amgx/amgnew/AMGX/build
-examples/amgx_capi -m <path-to-matrix>.mtx -c ../src/configs/PCG_V.json
+"$AMGX_ROOT/build/examples/amgx_capi" \
+  -m <path-to-matrix>.mtx \
+  -c "$AMGX_ROOT/src/configs/PCG_V.json"
 ```
 
+## Randomized Chimera comparison
 
+The Chimera experiment uses the repository configuration `data/amgx_pcg_amg_t1e8.json`.
+Run the GPU comparison from `data/`:
+
+```bash
+cd data
+AMGX="$AMGX_ROOT/build/examples/amgx_capi" \
+AMGX_LIB="$AMGX_ROOT/build" \
+./run_amgx_vs_gpu.sh chimera_nnzsort
+```
+
+The script derives all ParAC and converter paths from the repository. See
+[`data/amgx_vs_gpu_procedure.md`](../data/amgx_vs_gpu_procedure.md) for generation,
+rerun, and summary instructions.

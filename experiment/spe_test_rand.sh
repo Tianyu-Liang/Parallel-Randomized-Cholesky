@@ -10,10 +10,10 @@ for (( i=0; i<${#list1[@]}; i++ )); do
   number=1
   # Loop until the number exceeds a chosen limit (e.g., 16)
   while [ $number -le 32 ]; do
-    ../cpu_implementation/driver ${list1[i]} $number "" 1
+    ../cpu_implementation/driver ${list1[i]} $number "" 0
     number=$(( number * 2 ))
   done
-  ./driver ${list1[i]} 32 "" 1
+  ./driver ${list1[i]} 32 "" 0
 done
 
 

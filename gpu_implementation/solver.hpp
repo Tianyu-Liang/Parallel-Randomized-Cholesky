@@ -1,5 +1,8 @@
 #include "auxilliary.hpp"
 #include <random>
+#include <fstream>
+#include <string>
+#include <cstdlib>
 #include <cusparse.h>
 #include <cublas_v2.h>
 #include <thrust/execution_policy.h>
@@ -235,7 +238,7 @@ int apply_preconditioner(cusparseHandle_t &cusparseHandle, cublasHandle_t &cubla
 
 template <typename type_int, typename type_data>
 int prepare_and_solve(sparse_matrix_device<type_int, type_data> &laplacian, type_int *csr_rowptr_device, 
-    type_data *csr_val_device, type_int *csr_col_ind_device, type_data *diagonal_entries_device, double tolerance, bool physics, type_int factorization_nnz, bool removal)
+    type_data *csr_val_device, type_int *csr_col_ind_device, type_data *diagonal_entries_device, double tolerance, bool physics, type_int factorization_nnz, bool removal, char* rhsfile = nullptr)
 {
     cudaEvent_t start, stop;
     float milliseconds = 0;
@@ -428,8 +431,28 @@ int prepare_and_solve(sparse_matrix_device<type_int, type_data> &laplacian, type
    
     
     
-    // use random zero-sum vector as rightside for both physics and graph
-    generate_zero_sum_vector<type_data>(rightside, num_cols, 0);
+    // RHS: if rhsfile is given, read b from it (HyPre IJ vector format: a header line, then "idx val"
+    // per line) so the GPU solves the SAME b = M*g as HyPre/AMGX/CPU-AC. num_cols is the SOLVED size
+    // (physics has already trimmed the appended ground row/col), so the *_rhs.00000 file matches.
+    // Otherwise fall back to the zero-sum random RHS (valid only for CONNECTED graphs).
+    if (rhsfile != nullptr)
+    {
+        std::ifstream rin(rhsfile);
+        if(!rin) { printf("ERROR: cannot open rhsfile %s\n", rhsfile); exit(1); }
+        std::string header; std::getline(rin, header);   // skip the "ilower iupper" header line
+        type_int idx; type_data val;
+        for (size_t i = 0; i < num_cols; i++)
+        {
+            if(!(rin >> idx >> val))
+            { printf("ERROR: rhsfile %s has fewer than num_cols=%ld entries\n", rhsfile, (long)num_cols); exit(1); }
+            rightside[i] = val;
+        }
+        printf("RHS read from file: %s\n", rhsfile);
+    }
+    else
+    {
+        generate_zero_sum_vector<type_data>(rightside, num_cols, 0);   // zero-sum random (CONNECTED graphs only)
+    }
     cudaMemcpy(rightside_device, rightside, num_cols * sizeof(type_data), cudaMemcpyHostToDevice);
     // if(physics)
     // {
@@ -483,7 +506,7 @@ int prepare_and_solve(sparse_matrix_device<type_int, type_data> &laplacian, type
 
     // Compute r1 = dot(r, z)
     cublasDdot(cublasHandle, num_cols, d_r, 1, d_z, 1, &r1);
-    int MAX_ITERS = 300;
+    int MAX_ITERS = 1000;   // match AMGX/HyPre cap; converged seeds still stop early on the tol test
     type_data TOL = tolerance;
     
     

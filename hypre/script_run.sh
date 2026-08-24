@@ -1,5 +1,10 @@
-DATA=/pscratch/sd/t/tianyul/randla/graph_sparsify/data/hypre
-IJ=../hypre/src/test/ij
+#!/usr/bin/env bash
+set -u
+
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+ROOT=$(cd -- "$SCRIPT_DIR/.." && pwd)
+DATA=${DATA:-$ROOT/data/hypre}
+IJ=${IJ:-ij}
 
 # Graph Laplacians
 printf '\n%.0s' {1..30}

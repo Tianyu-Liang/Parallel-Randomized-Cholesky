@@ -1,7 +1,18 @@
 
 
-list1=("../physics/ecology1/ecology1-nnz-sorted.mtx" "../data/GAP-road/GAP-road-nnz-sorted.mtx" "../data/com-LiveJournal/com-LiveJournal-nnz-sorted.mtx" 
-    "../data/europe_osm/europe_osm-nnz-sorted.mtx" "../data/delaunay_n24/delaunay_n24-nnz-sorted.mtx" "../data/venturiLevel3/venturiLevel3-nnz-sorted.mtx" 
+# ---------------------------------------------------------------------------
+# com-LiveJournal is the DENSEST matrix in the suite and is EXCLUDED from this
+# default sweep -- it needs a non-default launch config and its own run:
+#   * num_blocks = 96  (argument 2)
+#   * 8 warps per squad/block: set WARPS_PER_SQUAD and HOST_WARPS_PER_SQUAD = 8
+#     in auxilliary.hpp and RECOMPILE (they are compile-time constants, NOT args).
+#   * pool-capacity multiplier (argument 6) >= 6 depending on ordering (4 worked
+#     in one test; use >= 6 to be safe).
+# After recompiling with 8 warps, run it on its own, e.g.:
+#   ./driver ../data/com-LiveJournal/com-LiveJournal-nnz-sorted.mtx 96 1 1e-7 "" 6
+# ---------------------------------------------------------------------------
+list1=("../physics/ecology1/ecology1-nnz-sorted.mtx" "../data/GAP-road/GAP-road-nnz-sorted.mtx"
+    "../data/europe_osm/europe_osm-nnz-sorted.mtx" "../data/delaunay_n24/delaunay_n24-nnz-sorted.mtx" "../data/venturiLevel3/venturiLevel3-nnz-sorted.mtx"
     "../data/belgium_osm/belgium_osm-nnz-sorted.mtx")
 
 for (( i=0; i<${#list1[@]}; i++ )); do

@@ -11,16 +11,16 @@ module load PrgEnv-gnu
 ## Clone
 
 ```bash
-cd /pscratch/sd/t/tianyul/hypre
-git clone https://github.com/hypre-space/hypre.git hypre_newest
-cd hypre_newest/src
+export HYPRE_ROOT=/path/to/hypre
+git clone https://github.com/hypre-space/hypre.git "$HYPRE_ROOT"
+cd "$HYPRE_ROOT/src"
 ```
 
 ## Configure (CPU with MPI + OpenMP, no CUDA)
 
 ```bash
 ./configure \
-  --prefix=/pscratch/sd/t/tianyul/hypre/hypre_newest/install \
+  --prefix="$HYPRE_ROOT/install" \
   --with-MPI \
   --with-openmp \
   --without-cuda \
@@ -41,14 +41,12 @@ make -j16
 make install
 ```
 
-The library is installed to:
-- `/pscratch/sd/t/tianyul/hypre/hypre_newest/install/lib/`
-- `/pscratch/sd/t/tianyul/hypre/hypre_newest/install/include/`
+The library is installed under `$HYPRE_ROOT/install/`.
 
 ## Building the test drivers
 
 ```bash
-cd /pscratch/sd/t/tianyul/hypre/hypre_newest/src/test
+cd "$HYPRE_ROOT/src/test"
 make ij CC=cc CXX=CC COPTS="-fopenmp" LINKOPTS="-fopenmp" LIBS="-L../hypre/lib -lHYPRE -lm -fopenmp"
 ```
 
@@ -58,19 +56,25 @@ Notes:
 
 ## Running benchmarks
 
-The benchmark script is at `script_run.sh`. It runs all 15 matrices with AMG-PCG (`-solver 1 -tol 1e-6`).
+From the ParAC repository root, `hypre/script_run.sh` runs the original 15-matrix suite
+with AMG-PCG (`-solver 1 -tol 1e-6`). Set `IJ` to the test driver built above; `DATA`
+defaults to `data/hypre` in this repository and can also be overridden.
 
 ```bash
 export OMP_NUM_THREADS=32
 export OMP_PLACES=cores
 export OMP_PROC_BIND=spread
-bash script_run.sh
+IJ="$HYPRE_ROOT/src/test/ij" bash hypre/script_run.sh
 ```
 
-The data files are in `/pscratch/sd/t/tianyul/randla/graph_sparsify/data/hypre/`.
-See `data/README.md` for how to regenerate them.
+See [`data/README.md`](../data/README.md) for how to generate the files in `data/hypre/`.
 
-For multi-thread scaling, use `hypre_omp_job.sh` which sweeps over thread counts (1, 2, 4, 8, 16, 32).
+For multi-thread scaling, use `hypre/hypre_omp_job.sh`, which sweeps over thread counts
+(1, 2, 4, 8, 16, 32). It accepts the same `IJ` and `DATA` overrides and writes logs to
+`hypre/omplogs/` by default.
+
+For the randomized Chimera comparison, use `data/run_ac_vs_hypre.sh` or the generic
+`data/run_hypre_ij.sh`. Both accept `IJ=/path/to/ij`.
 
 ## Running (general)
 

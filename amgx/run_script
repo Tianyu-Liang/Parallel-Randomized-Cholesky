@@ -1,8 +1,13 @@
-# Run from AMGX build/ directory
-AMGX=examples/amgx_capi
-PCG_V=../src/configs/PCG_V.json
-AMG_CG=../src/configs/AMG_CLASSICAL_CG.json
-DATA=/pscratch/sd/t/tianyul/randla/graph_sparsify/data/amgx
+#!/usr/bin/env bash
+set -u
+
+# Set AMGX, PCG_V, and AMG_CG to files in an AMGX installation.
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+ROOT=$(cd -- "$SCRIPT_DIR/.." && pwd)
+AMGX=${AMGX:-amgx_capi}
+PCG_V=${PCG_V:-PCG_V.json}
+AMG_CG=${AMG_CG:-AMG_CLASSICAL_CG.json}
+DATA=${DATA:-$ROOT/data/amgx}
 
 # Graph Laplacians
 printf '\n%.0s' {1..30}
